@@ -1,33 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './user.entity';
-import { CreateUserDto } from './createUserDto';
+import { User } from './user.model';
+import { CreateUserDto } from './dto/createUserDto';
+import { InjectModel } from '@nestjs/sequelize';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
+  constructor(
+    @InjectModel(User) private userModel: typeof User,
+    private roleService: RolesService,
+  ) {}
 
-  async create(createUser: CreateUserDto): Promise<User> {
-    const { name, surname, email } = createUser;
-    const user = await this.userRepo.create({
-      email,
-      name,
-      surname,
-    });
-    return this.userRepo.save(user);
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    try {
+      const user = await this.userModel.create(createUserDto);
+      const role = await this.roleService.getRoleByValue('USER');
+      await user.$set('roles', [role.id]);
+      return user;
+    } catch (error) {
+      console.log(error, 'sasa');
+    }
   }
 
-  findAll(): Promise<Array<User>> {
-    return this.userRepo.find();
+  async findAll(): Promise<Array<User>> {
+    const users = await this.userModel.findAll({ include: { all: true } });
+    return users;
   }
 
-  findOne(id: number | any): Promise<User> {
-    return this.userRepo.findOne(id);
-  }
+  // findOne(id: number | any): Promise<User> {
+  //   return this.userModel.findOne(id);
+  // }
 
-  async delete(id: number): Promise<string> {
-    await this.userRepo.delete(id);
-    return 'Deleted successfully';
-  }
+  // async delete(id: number): Promise<string> {
+  //   await this.userModel.delete(id);
+  //   return 'Deleted successfully';
+  // }
 }

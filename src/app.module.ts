@@ -1,32 +1,35 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user/user.entity';
-import { UserModule } from './user/user.module';
+import { User } from './user/user.model';
 import { ConfigModule } from '@nestjs/config';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { UserModule } from './user/user.module';
+import { RolesModule } from './roles/roles.module';
+import { Roles } from './roles/roles.model';
+import { UserRoles } from './roles/user-roles.model';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
+  controllers: [AuthController],
+  providers: [AuthService],
   imports: [
     ConfigModule.forRoot({
       expandVariables: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
+    SequelizeModule.forRoot({
+      dialect: 'postgres',
       host: 'localhost',
       port: 4000,
       username: 'postgres',
       password: 'fener',
       database: 'test',
-      entities: [User],
-      synchronize: true,
-      retryAttempts: 30,
-      retryDelay: 5000,
-      autoLoadEntities: true,
+      models: [User, Roles, UserRoles],
+      autoLoadModels: true,
     }),
     UserModule,
+    RolesModule,
+    AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
