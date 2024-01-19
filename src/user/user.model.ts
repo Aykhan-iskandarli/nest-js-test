@@ -1,19 +1,13 @@
 /* eslint-disable prettier/prettier */
-// import { IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-// import { Roles } from 'src/roles/roles.model';
 import {  BelongsToMany, Column, DataType, Model, Table } from 'sequelize-typescript';
 import { Roles } from 'src/roles/roles.model';
 import { UserRoles } from 'src/roles/user-roles.model';
-// import { UserRoles } from 'src/roles/user-roles.model';
 
 
 
 @Table({ tableName: 'user' })
 export class User extends Model<User> {
-  static find(): Promise<User[]> {
-    throw new Error('Method not implemented.');
-  }
   @ApiProperty({ example: '1', description: 'User identity' })
   @Column({ type: DataType.INTEGER, autoIncrement: true, primaryKey: true })
   id: number;
@@ -31,7 +25,7 @@ export class User extends Model<User> {
   banned: string;
 
   @ApiProperty({example:'ban description', description:"ban reason"})
-  @Column({ type: DataType.BOOLEAN, allowNull: true})
+  @Column({ type: DataType.STRING, allowNull: true})
   banReason: string;
 
   @BelongsToMany(() => Roles,()=> UserRoles )

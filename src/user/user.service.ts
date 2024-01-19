@@ -11,11 +11,12 @@ export class UserService {
     private roleService: RolesService,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     try {
       const user = await this.userModel.create(createUserDto);
       const role = await this.roleService.getRoleByValue('USER');
       await user.$set('roles', [role.id]);
+      user.roles = [role];
       return user;
     } catch (error) {
       console.log(error, 'sasa');
@@ -27,12 +28,11 @@ export class UserService {
     return users;
   }
 
-  // findOne(id: number | any): Promise<User> {
-  //   return this.userModel.findOne(id);
-  // }
-
-  // async delete(id: number): Promise<string> {
-  //   await this.userModel.delete(id);
-  //   return 'Deleted successfully';
-  // }
+  async getUserByEmail(email: string) {
+    const user = await this.userModel.findOne({
+      where: { email },
+      include: { all: true },
+    });
+    return user;
+  }
 }

@@ -20,6 +20,6 @@ export class UserController {
   @ApiResponse({ status: 200, type: User })
   @Post('create')
   create(@Body() createUserDto: CreateUserDto): Promise<any> {
-    return this.userService.create(createUserDto);
+    return this.userService.createUser(createUserDto);
   }
 }
