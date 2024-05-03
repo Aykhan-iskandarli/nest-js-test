@@ -16,6 +16,4 @@ export class UserRoles extends Model<User>{
     @ForeignKey(()=>User)
     @Column({ type: DataType.NUMBER, unique:true})
     userId: number;
-  
-
 }
